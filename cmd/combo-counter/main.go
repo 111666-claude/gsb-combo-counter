@@ -38,12 +38,13 @@ func Run(args []string, stdout, stderr io.Writer) int {
 		swing(tracker, 5, "dummy", 1000)
 		fmt.Fprintf(stdout, "count=%d multiplier=%.1f\n", tracker.Count(1000), tracker.Multiplier(1000))
 	case "settle":
-		// 五连击先结算一次，再补一下看快照跟不跟得上。
+		// 五连击先结算一次，再补一下，重新结算看快照跟不跟得上。
 		for index, at := range []int64{0, 100, 200, 300, 400} {
 			swing(tracker, index, "dummy", at)
 		}
-		settledCount, settledMultiplier := tracker.Settle(400)
+		tracker.Settle(400)
 		swing(tracker, 5, "dummy", 500)
+		settledCount, settledMultiplier := tracker.Settle(500)
 		fmt.Fprintf(stdout, "live=%d/%.1f settled=%d/%.1f\n",
 			tracker.Count(500), tracker.Multiplier(500), settledCount, settledMultiplier)
 	case "churn":
